@@ -1,7 +1,7 @@
 # gameflix
 the live site: https://gameflix-fawn.vercel.app/
 
-gameflix show you the games everyone is playing on steam right now. You can save a game for later and leave a short note on it.
+gameflix shows you the games everyone is playing on steam right now. You can save a game for later and leave a short note on it.
 
 if you want to run it locally 
 
