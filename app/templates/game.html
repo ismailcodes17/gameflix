@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}{{ game.name }} · Game Flix{% endblock %}
+{% block body %}
+  <p><a class="text-sm text-zinc-400 hover:text-white" href="{{ '/saved' if saved else '/' }}">Back</a></p>
+  <h1 class="mt-3 text-3xl font-semibold tracking-tight text-white">{{ game.name }}</h1>
+  {% if game.short_description %}
+    <p class="mt-4 max-w-xl text-zinc-300">{{ game.short_description }}</p>
+  {% endif %}
+  <div class="relative mt-6 aspect-[460/215] w-full max-w-xl overflow-hidden rounded-2xl bg-zinc-800">
+    <div class="absolute inset-0 animate-pulse bg-zinc-700"></div>
+    <img class="relative h-full w-full object-cover" src="{{ game.image_url }}" alt="" onload="this.previousElementSibling.remove()" onerror="this.remove()">
+  </div>
+
+  <h2 class="mt-8 text-lg font-medium text-white">What friends think</h2>
+  {% for thought in thoughts %}
+    <article class="mt-4 border-t border-white/10 pt-4">
+      <p class="text-sm text-zinc-400">{{ thought.friend_name }} · {{ thought.rating }}/5</p>
+      <p class="mt-1 text-white">{{ thought.comment }}</p>
+    </article>
+  {% else %}
+    <p class="mt-3 text-zinc-400">No thoughts yet.</p>
+  {% endfor %}
+
+  {% if saved %}
+  <h2 class="mt-8 text-lg font-medium text-white">Add a thought</h2>
+  <form class="mt-4 grid max-w-md gap-3" method="post" action="/games/{{ game.app_id }}/thoughts">
+    <label class="grid gap-1 text-sm text-zinc-400">Name <input class="rounded-lg border border-white/10 bg-zinc-900 px-3 py-2 text-white" name="friend_name" required></label>
+    <label class="grid gap-1 text-sm text-zinc-400">Rating
+      <select class="rounded-lg border border-white/10 bg-zinc-900 px-3 py-2 text-white" name="rating">
+        <option>5</option>
+        <option>4</option>
+        <option>3</option>
+        <option>2</option>
+        <option>1</option>
+      </select>
+    </label>
+    <label class="grid gap-1 text-sm text-zinc-400">Thought <textarea class="min-h-24 rounded-lg border border-white/10 bg-zinc-900 px-3 py-2 text-white" name="comment" required></textarea></label>
+    <button class="w-fit rounded-full bg-white px-4 py-2 text-sm font-semibold text-zinc-950 transition active:scale-95 hover:bg-amber-300">Post</button>
+  </form>
+  {% else %}
+    <p class="mt-8 text-sm text-zinc-400">Save this game to leave a thought.</p>
+  {% endif %}
+{% endblock %}

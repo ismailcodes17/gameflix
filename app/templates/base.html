@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Game Flix{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { background: #09090b; color: #fafaf9; }
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: none; }
+    }
+    .rise { animation: rise 0.45s ease both; }
+    .delay-1 { animation-delay: 0.08s; }
+    .delay-2 { animation-delay: 0.16s; }
+    .delay-3 { animation-delay: 0.24s; }
+    [data-card] { position: relative; }
+    [data-card]::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: radial-gradient(160px circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,0.16), transparent 70%);
+      opacity: 0;
+      transition: opacity 0.25s ease;
+      pointer-events: none;
+    }
+    [data-card]:hover::before { opacity: 1; }
+    [data-card] > * { position: relative; z-index: 1; }
+    .h-scroll { scroll-behavior: smooth; }
+  </style>
+</head>
+<body class="bg-zinc-950 text-stone-100 antialiased">
+  <header class="flex items-center justify-between border-b border-white/10 px-6 py-4">
+    <a class="text-lg font-semibold tracking-tight text-white" href="/">Game Flix</a>
+    <nav class="flex gap-5 text-sm text-zinc-400">
+      <a class="transition duration-200 {{ 'text-white' if request.url.path == '/' else 'hover:text-white' }}" href="/">Hot</a>
+      <a class="transition duration-200 {{ 'text-white' if request.url.path == '/saved' else 'hover:text-white' }}" href="/saved">Play later</a>
+      <a class="transition duration-200 {{ 'text-white' if request.url.path == '/about' else 'hover:text-white' }}" href="/about">About</a>
+    </nav>
+  </header>
+  <main class="rise mx-auto max-w-6xl px-6 py-8">
+    {% block body %}{% endblock %}
+  </main>
+  <script>
+    document.addEventListener("mousemove", (event) => {
+      const card = event.target.closest("[data-card]");
+      if (!card) return;
+      const box = card.getBoundingClientRect();
+      card.style.setProperty("--mx", `${event.clientX - box.left}px`);
+      card.style.setProperty("--my", `${event.clientY - box.top}px`);
+    });
+
+    document.querySelectorAll("[data-nudge]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const row = button.parentElement.querySelector(".h-scroll");
+        const card = row.querySelector("[data-card]");
+        const distance = (card ? card.offsetWidth : 288) + 16;
+        row.scrollBy({ left: distance * Number(button.dataset.nudge), behavior: "smooth" });
+      });
+    });
+
+    const pages = ["/", "/saved", "/about"];
+    const names = { "/": "Hot", "/saved": "Play later", "/about": "About" };
+    let intent = 0;
+    let leaving = false;
+    const hint = document.createElement("div");
+    hint.className = "pointer-events-none fixed inset-x-0 bottom-8 z-50 mx-auto hidden w-64 rounded-full bg-zinc-900/90 px-4 py-3 text-center text-sm text-zinc-300 ring-1 ring-white/10";
+    hint.innerHTML = '<p data-label></p><div class="mt-2 h-1 overflow-hidden rounded-full bg-white/10"><div data-bar class="h-full bg-amber-300" style="width:0"></div></div>';
+    document.body.appendChild(hint);
+
+    function hideHint() {
+      intent = 0;
+      hint.classList.add("hidden");
+      document.body.style.transform = "";
+      document.body.style.opacity = "";
+    }
+
+    document.addEventListener("wheel", (event) => {
+      if (leaving) {
+        event.preventDefault();
+        return;
+      }
+      const here = pages.indexOf(location.pathname);
+      if (here === -1) return;
+      const atPageEnd = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4;
+      const atPageStart = window.scrollY <= 2;
+      const forward = event.deltaY > 0 && atPageEnd && here < pages.length - 1;
+      const back = event.deltaY < 0 && atPageStart && here > 0;
+      if (!forward && !back) {
+        hideHint();
+        return;
+      }
+      event.preventDefault();
+      intent += Math.abs(event.deltaY);
+      const needed = 900;
+      const progress = Math.min(intent / needed, 1);
+      const target = forward ? pages[here + 1] : pages[here - 1];
+      hint.style.bottom = location.pathname === "/saved" ? "0.5rem" : "2rem";
+      hint.classList.remove("hidden");
+      hint.querySelector("[data-label]").textContent = "Keep going to open " + names[target];
+      hint.querySelector("[data-bar]").style.width = `${progress * 100}%`;
+      document.body.style.transition = "none";
+      document.body.style.transform = `translateY(${forward ? -24 * progress : 24 * progress}px)`;
+      if (progress < 1) return;
+      leaving = true;
+      document.body.style.transition = "transform 0.7s ease, opacity 0.7s ease";
+      document.body.style.transform = `translateY(${forward ? "-80px" : "80px"})`;
+      document.body.style.opacity = "0";
+      setTimeout(() => { location.href = target; }, 650);
+    }, { passive: false });
+  </script>
+</body>
+</html>

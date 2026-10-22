@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Play later · Game Flix{% endblock %}
+{% block body %}
+  <h1 class="text-3xl font-semibold tracking-tight text-white">Play later</h1>
+  {% if games %}
+    <section class="h-scroll mt-8 flex snap-x snap-mandatory items-start gap-4 overflow-x-auto pb-4">
+      {% for game in games %}
+        <article data-card class="group w-72 shrink-0 snap-start overflow-hidden rounded-2xl bg-zinc-900 ring-1 ring-white/10 transition duration-200 hover:-translate-y-1">
+          <div class="relative aspect-[460/215] w-full overflow-hidden bg-zinc-800">
+            <div class="absolute inset-0 animate-pulse bg-zinc-700"></div>
+            <img class="relative h-full w-full object-cover transition duration-300 group-hover:scale-105" src="{{ game.image_url }}" alt="" onload="this.previousElementSibling.remove()" onerror="this.remove()">
+          </div>
+          <div class="p-4">
+            <h2 class="text-lg font-medium text-white">{{ game.name }}</h2>
+            <a class="mt-4 block w-full rounded-full bg-white px-3 py-2 text-center text-sm font-semibold text-zinc-950 transition active:scale-95 hover:bg-amber-300" href="/games/{{ game.app_id }}">Friend thoughts</a>
+            <form method="post" action="/saved/{{ game.app_id }}/remove">
+              <button class="mt-2 w-full rounded-full border border-white/20 px-3 py-2 text-sm text-zinc-300 transition active:scale-95 hover:text-white">Remove</button>
+            </form>
+          </div>
+        </article>
+      {% endfor %}
+    </section>
+  {% else %}
+    <p class="mt-4 text-zinc-400">Nothing saved yet. Go to <a class="text-white underline" href="/">Hot</a> and pick one.</p>
+  {% endif %}
+  <div class="h-28"></div>
+{% endblock %}

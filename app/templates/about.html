@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}About · Game Flix{% endblock %}
+{% block body %}
+  <h1 class="text-3xl font-semibold text-white">About</h1>
+  <p class="mt-4 max-w-xl text-zinc-300">Game Flix pulls the games people are playing on Steam right now. You can save one for later and leave a short note on it.</p>
+
+  <section class="mt-8 grid gap-4 sm:grid-cols-3">
+    <a data-card href="/" class="block rounded-2xl bg-zinc-900 p-5 ring-1 ring-white/10 transition duration-200 hover:-translate-y-1">
+      <h2 class="text-lg font-medium text-white">Hot and Climbing</h2>
+      <p class="mt-2 text-sm text-zinc-400">Hot is the most played list. Climbing is games that moved up since last week.</p>
+    </a>
+    <a data-card href="/saved" class="block rounded-2xl bg-zinc-900 p-5 ring-1 ring-white/10 transition duration-200 hover:-translate-y-1">
+      <h2 class="text-lg font-medium text-white">Play later</h2>
+      <p class="mt-2 text-sm text-zinc-400">Save stores the game. Remove only takes it off your list.</p>
+    </a>
+    <a data-card href="/saved" class="block rounded-2xl bg-zinc-900 p-5 ring-1 ring-white/10 transition duration-200 hover:-translate-y-1">
+      <h2 class="text-lg font-medium text-white">Notes</h2>
+      <p class="mt-2 text-sm text-zinc-400">Open a saved game to leave a name, a rating, and a comment. There is no account yet.</p>
+    </a>
+  </section>
+{% endblock %}

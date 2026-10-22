@@ -1,0 +1,28 @@
+{% if q|length < 2 %}
+{% elif games %}
+  <div class="mt-8 flex flex-wrap items-start gap-4">
+    {% for game in games %}
+      <article data-card class="group w-72 overflow-hidden rounded-2xl bg-zinc-900 ring-1 ring-white/10">
+        <a href="/games/{{ game.app_id }}" class="block">
+          <div class="relative aspect-[460/215] w-full bg-zinc-800">
+            <div class="absolute inset-0 animate-pulse bg-zinc-700"></div>
+            <img class="relative h-full w-full object-cover" src="{{ game.image_url }}" alt="" onload="this.previousElementSibling.remove()" onerror="this.remove()">
+          </div>
+        </a>
+        <div class="p-4">
+          <a href="/games/{{ game.app_id }}" class="block text-lg font-medium text-white hover:text-amber-300">{{ game.name }}</a>
+          <form method="post" action="/saved">
+            <input type="hidden" name="app_id" value="{{ game.app_id }}">
+            <input type="hidden" name="name" value="{{ game.name }}">
+            <input type="hidden" name="peak_players" value="0">
+            <input type="hidden" name="image_url" value="{{ game.image_url }}">
+            <input type="hidden" name="short_description" value="">
+            <button class="mt-4 w-full rounded-full bg-white px-3 py-2 text-sm font-semibold text-zinc-950 transition active:scale-95 hover:bg-amber-300">Save</button>
+          </form>
+        </div>
+      </article>
+    {% endfor %}
+  </div>
+{% else %}
+  <p class="mt-8 text-sm text-zinc-400">No games for that search.</p>
+{% endif %}

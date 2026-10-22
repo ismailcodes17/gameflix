@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}Hot right now · Game Flix{% endblock %}
+{% block body %}
+  <h1 class="text-3xl font-semibold text-white">Hot right now</h1>
+  <input id="search" type="search" placeholder="Search games" class="mt-6 w-full max-w-sm rounded-full border border-white/10 bg-zinc-900 px-4 py-2 text-sm text-white outline-none">
+  {% if error %}
+    <p class="mt-4 text-red-300">{{ error }}</p>
+  {% endif %}
+
+  <div id="shelves">
+  <section data-row class="mt-8">
+    <h2 class="text-sm text-zinc-400">Most played</h2>
+    <div class="mt-4 flex items-center gap-3">
+      <button type="button" data-nudge="-1" class="h-10 w-10 shrink-0 rounded-full border border-white/20 text-lg text-zinc-300 transition hover:text-white" aria-label="Scroll left">‹</button>
+      <div class="h-scroll flex snap-x snap-mandatory items-start gap-4 overflow-x-auto pb-4">
+      {% for game in games %}
+        <article data-card data-name="{{ game.name }}" class="group w-72 shrink-0 snap-start overflow-hidden rounded-2xl bg-zinc-900 ring-1 ring-white/10 transition duration-200 hover:-translate-y-1">
+          <a href="/games/{{ game.app_id }}" class="block">
+            <div class="relative aspect-[460/215] w-full bg-zinc-800">
+              <div class="absolute inset-0 animate-pulse bg-zinc-700"></div>
+              <img class="relative h-full w-full object-cover transition duration-300 group-hover:scale-105" src="{{ game.image_url }}" alt="" onload="this.previousElementSibling.remove()" onerror="this.remove()">
+            </div>
+          </a>
+          <div class="p-4">
+            <p class="text-xs text-zinc-500">#{{ game.rank }}</p>
+            <a href="/games/{{ game.app_id }}" class="mt-1 block text-lg font-medium text-white hover:text-amber-300">{{ game.name }}</a>
+            <p class="mt-1 text-sm text-zinc-400">{{ "{:,}".format(game.peak_players) }} peak players</p>
+            <form method="post" action="/saved">
+              <input type="hidden" name="app_id" value="{{ game.app_id }}">
+              <input type="hidden" name="name" value="{{ game.name }}">
+              <input type="hidden" name="peak_players" value="{{ game.peak_players }}">
+              <input type="hidden" name="image_url" value="{{ game.image_url }}">
+              <input type="hidden" name="short_description" value="{{ game.short_description }}">
+              <button class="mt-4 w-full rounded-full bg-white px-3 py-2 text-sm font-semibold text-zinc-950 transition active:scale-95 hover:bg-amber-300">Save</button>
+            </form>
+          </div>
+        </article>
+      {% endfor %}
+      </div>
+      <button type="button" data-nudge="1" class="h-10 w-10 shrink-0 rounded-full border border-white/20 text-lg text-zinc-300 transition hover:text-white" aria-label="Scroll right">›</button>
+    </div>
+    {% if hot < hot_total %}
+      <a class="mt-2 inline-block rounded-full border border-white/20 px-4 py-2 text-sm text-zinc-300 transition hover:text-white" href="/?hot={{ hot + 5 }}&up={{ up }}">Show 5 more</a>
+    {% endif %}
+  </section>
+
+  <section data-row class="mt-6">
+    <h2 class="text-sm text-zinc-400">Climbing</h2>
+    <div class="mt-4 flex items-center gap-3">
+      <button type="button" data-nudge="-1" class="h-10 w-10 shrink-0 rounded-full border border-white/20 text-lg text-zinc-300 transition hover:text-white" aria-label="Scroll left">‹</button>
+      <div class="h-scroll flex snap-x snap-mandatory items-start gap-4 overflow-x-auto pb-4">
+      {% for game in rising %}
+        <article data-card data-name="{{ game.name }}" class="group w-72 shrink-0 snap-start overflow-hidden rounded-2xl bg-zinc-900 ring-1 ring-white/10 transition duration-200 hover:-translate-y-1">
+          <a href="/games/{{ game.app_id }}" class="block">
+            <div class="relative aspect-[460/215] w-full bg-zinc-800">
+              <div class="absolute inset-0 animate-pulse bg-zinc-700"></div>
+              <img class="relative h-full w-full object-cover transition duration-300 group-hover:scale-105" src="{{ game.image_url }}" alt="" onload="this.previousElementSibling.remove()" onerror="this.remove()">
+            </div>
+          </a>
+          <div class="p-4">
+            <p class="text-xs text-zinc-500">#{{ game.rank }} · was #{{ game.last_week_rank }}</p>
+            <a href="/games/{{ game.app_id }}" class="mt-1 block text-lg font-medium text-white hover:text-amber-300">{{ game.name }}</a>
+            <p class="mt-1 text-sm text-zinc-400">{{ "{:,}".format(game.peak_players) }} peak players</p>
+            <form method="post" action="/saved">
+              <input type="hidden" name="app_id" value="{{ game.app_id }}">
+              <input type="hidden" name="name" value="{{ game.name }}">
+              <input type="hidden" name="peak_players" value="{{ game.peak_players }}">
+              <input type="hidden" name="image_url" value="{{ game.image_url }}">
+              <input type="hidden" name="short_description" value="{{ game.short_description }}">
+              <button class="mt-4 w-full rounded-full bg-white px-3 py-2 text-sm font-semibold text-zinc-950 transition active:scale-95 hover:bg-amber-300">Save</button>
+            </form>
+          </div>
+        </article>
+      {% else %}
+        <p class="text-sm text-zinc-400">Nothing climbed this week.</p>
+      {% endfor %}
+      </div>
+      <button type="button" data-nudge="1" class="h-10 w-10 shrink-0 rounded-full border border-white/20 text-lg text-zinc-300 transition hover:text-white" aria-label="Scroll right">›</button>
+    </div>
+    {% if up < up_total %}
+      <a class="mt-2 inline-block rounded-full border border-white/20 px-4 py-2 text-sm text-zinc-300 transition hover:text-white" href="/?hot={{ hot }}&up={{ up + 5 }}">Show 5 more</a>
+    {% endif %}
+  </section>
+  </div>
+  <div id="results"></div>
+
+  <script>
+    const search = document.getElementById("search");
+    const shelves = document.getElementById("shelves");
+    const results = document.getElementById("results");
+    let pending;
+    search.addEventListener("input", () => {
+      clearTimeout(pending);
+      const query = search.value.trim();
+      if (query.length < 2) {
+        results.innerHTML = "";
+        shelves.hidden = false;
+        return;
+      }
+      pending = setTimeout(async () => {
+        const response = await fetch("/search?q=" + encodeURIComponent(query));
+        results.innerHTML = await response.text();
+        shelves.hidden = true;
+      }, 300);
+    });
+  </script>
+{% endblock %}
